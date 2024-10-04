@@ -1,0 +1,116 @@
+﻿@model CompanyManagement.ViewModel.TicketChatViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Ticket Chat";
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <img class="profile-user-img img-fluid img-circle" src="/dist/img/avatar4.png" alt="User profile picture" style="width: 100px; height: 100px;" />
+                        </div>
+
+                        <h3 class="profile-username text-center">@Model.AssignedBy</h3>
+
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Reference ID:</b> <span class="float-right">@Model.TicketId</span>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Created Date:</b> <span class="float-right">@Model.CreatedDate.ToString("d MMM yyyy")</span>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Status:</b>
+                                <span class="float-right">
+                                    @{
+                                        string statusDisplay = Model.Status switch
+                                        {
+                                            "1" => "Active",
+                                            "2" => "Processing",
+                                            "3" => "Closed",
+                                            "4" => "Discard",
+                                            _ => "Unknown Status"
+                                        };
+                                    }
+                                    @statusDisplay
+                                </span>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Product:</b> <span class="float-right">@Model.Product</span>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Assigned:</b> <span class="float-right">@Model.AssignedBy</span>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Ticket Creator:</b> <span class="float-right">@Model.UserTitle</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>@Model.TicketSubject</h4>
+                        <form asp-action="Communicate" asp-controller="Ticket" method="post" enctype="multipart/form-data" class="mb-3">
+                            <input type="hidden" asp-for="TicketId" />
+                            <input type="hidden" asp-for="UserId" />
+                            <input type="hidden" asp-for="CreatedDate" />
+
+                            <div class="form-group">
+                                <textarea asp-for="ChatMessage" class="form-control" placeholder="Type a message" rows="3" required></textarea>
+                                <span asp-validation-for="ChatMessage" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="file" asp-for="FileUpload" class="form-control-file" />
+                                <span asp-validation-for="FileUpload" class="text-danger"></span>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Send</button>
+                        </form>
+
+                        <div class="chat-messages">
+                            @if (Model.PreviousMessages != null && Model.PreviousMessages.Any())
+                            {
+                                var sortedMessages = Model.PreviousMessages.OrderByDescending(m => m.CreatedDate).ToList();
+
+                                foreach (var message in sortedMessages)
+                                {
+                                    <div class="post">
+                                        <div class="user-block">
+                                            <img class="img-circle img-bordered-sm" src="@Url.Content("/dist/img/avatar2.png")" alt="user image">
+                                            <span class="username">
+                                                <a href="#">@message.UserTitle</a>
+                                            </span>
+                                            <span class="description">
+                                                @message.CreatedDate.ToString("h:mm tt") - @message.MessageType
+                                            </span>
+                                        </div>
+                                        <p>
+                                            @message.ChatMessage
+                                            @if (!string.IsNullOrEmpty(message.FileUploadPath))
+                                            {
+                                                <img src="@Url.Content("~/" + message.FileUploadPath)" alt="uploaded file" style="max-width: 100%; border-radius: 10px; display: block; margin-top: 5px;">
+                                            }
+                                        </p>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p>No messages found.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

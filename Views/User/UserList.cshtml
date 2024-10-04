@@ -1,0 +1,150 @@
+﻿@model IEnumerable<dynamic> 
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "User List";
+}
+
+<partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+
+<div class="wrapper">
+    <div class="container-fluid">
+        <form class="content">
+            <div class="row mt-2">
+                <div class="col-md-12">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between">
+                                <div class="card-title">User List</div>
+                                <div class="btn-action">
+                                    <a class="btn btn-warning mr-1" href="/User/ProductManagement">User Product</a>
+                                    <button class="btn btn-primary " type="button" onclick="addUser()">Add User</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-bordered table-striped dataTable dtr-inline">
+                                        <thead>
+                                            <tr>
+                                                <th>User Name</th>
+                                                <th>Role</th>
+                                                <th>Company Name</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var user in Model)
+                                            {
+                                                <tr>
+                                                    <td>@user.UserName</td>
+                                                    <td>@user.UserRoleName</td> <!-- Show Role Name -->
+                                                    <td>@user.CompanyName</td> <!-- Show Company Name -->
+                                                    <td>
+                                                        <a class="btn btn-dark mr-1" href="javascript:void(0);" onclick="editUser('@user.Id')"> <i class="fas fa-edit"></i></a>
+                                                        <button class="btn btn-primary" type="button" onclick="resetPassword('@user.Id')"><i class="fa fa-key"></i></button>
+                                                        <button class="btn btn-danger" type="button" onclick="UserDelete('@user.Id')"><i class="fas fa-trash"></i> </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="modal fade" id="MainModal" role="dialog" aria-labelledby="MainModal" aria-hidden="true">
+            <div id="MainModalBody"></div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable
+        $("#example2").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        });
+    });
+    function onSuccessForTicket(context) {
+        ToastNotification(context);
+        if (context.MessageType == MessageType.Success) {
+            setTimeout(() => {
+                location.reload()
+            }, 3000);
+        }
+    }
+    function addUser() {
+        $.get('/User/AddUser')
+            .done(function (data) {
+                $('#MainModalBody').html(data);
+                $('#MainModal').modal('show');
+            })
+            .fail(function () {
+                alert('Failed to load add user modal.');
+            });
+    }
+
+    function editUser(userId) {
+        $.get('/User/UserEdit/' + userId)
+            .done(function (data) {
+                $('#MainModalBody').html(data);
+                $('#MainModal').modal('show');
+            })
+            .fail(function () {
+                alert('Failed to load edit user modal.');
+            });
+    }
+
+    function UserDelete(id) {
+        alertify.confirm("Are you sure to delete this User!",
+            function () {
+                $.post("/User/UserDelete", { id: id })
+                    .done(function (context) {
+                        ToastNotification(context);
+                        if (context.MessageType == "Success") {
+                            setTimeout(() => {
+                                location.reload();
+                            }, 300);
+                        }
+                    })
+                    .fail(function () {
+                        alert('Failed to delete user.');
+                    });
+            },
+            function () {
+                alertify.error('Cancel');
+            }
+        );
+    }
+
+    function resetPassword(userId) {
+        alertify.confirm(
+            'Confirm Password Reset',
+            'Are you sure you want to reset the password for this user?',
+            function () {
+                $.ajax({
+                    url: '@Url.Action("ResetPassword", "User")',
+                    type: 'POST',
+                    data: { id: userId },
+                    success: function (response) {
+                        alert(response.message); // Show success or error message
+                    },
+                    error: function (xhr) {
+                        alert('An error occurred: ' + xhr.responseText);
+                    }
+                });
+            },
+            function () {
+                alertify.error('Password reset canceled.');
+            }
+        );
+    }
+</script>

@@ -1,0 +1,31 @@
+﻿@model IEnumerable<CompanyManagement.ViewModel.TicketVm>
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Discarded Tickets";
+}
+
+<div class="container">
+    <h2>Closed Tickets</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Issued By</th>
+                <th>Product</th>
+                <th>Subject</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in Model)
+            {
+                <tr>
+                    <td>@ticket.IssuedByName</td>
+                    <td>@ticket.ProductName</td>
+                    <td>@ticket.TicketSubject</td>
+                    <td>@ticket.ActiveStatus</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

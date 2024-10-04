@@ -1,0 +1,160 @@
+﻿@using CompanyManagement.Helper
+@model CompanyManagement.Models.User
+@{
+    Layout = "_LoginLayout";
+    ViewData["Title"] = "Login";
+    var logininfo = (ResponseMessage)ViewBag.LoginInfo;
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #ecf0f3, #d1d9e0); /* Gradient background */
+        height: 100vh; /* Full height */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .wrapper {
+        max-width: 350px;
+        width: 100%; /* Full width */
+        padding: 40px 30px;
+        background-color: #ffffff; /* White background for the form */
+        border-radius: 15px;
+        box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #fff;
+        text-align: center; /* Center text within the wrapper */
+        display: flex; /* Enable flexbox */
+        flex-direction: column; /* Arrange children in a column */
+        justify-content: center; /* Center vertically */
+        padding-bottom: 60px; /* Add bottom padding */
+    }
+
+        .wrapper .logo {
+            width: 100px; /* Set logo width */
+            height: 100px; /* Set logo height to the same value */
+            border-radius: 50%; /* Make it round */
+            margin: 40px auto 20px auto; /* Increase top margin to lower the logo further */
+            object-fit: cover; /* Ensure the image covers the circle */
+        }
+
+        .wrapper .name {
+            font-weight: 600;
+            font-size: 1.4rem;
+            letter-spacing: 1.3px;
+            color: #555;
+            margin-bottom: 20px; /* Spacing below title */
+        }
+
+        .wrapper .form-field {
+            display: flex; /* Use flexbox for alignment */
+            align-items: center; /* Center items vertically */
+            margin-bottom: 20px;
+            border-radius: 20px; /* Rounded corners */
+            box-shadow: inset 8px 8px 8px #cbced1, inset -8px -8px 8px #fff;
+            background-color: #f7f7f7; /* Light background */
+            border: 1px solid #03A9F4; /* Border color */
+            padding: 0 10px; /* Padding around the input field */
+        }
+
+            .wrapper .form-field span {
+                margin-right: 10px; /* Space between icon and input */
+                color: #555;
+                display: flex; /* Center icon vertically */
+                align-items: center; /* Align icon vertically */
+            }
+
+            .wrapper .form-field input {
+                flex-grow: 1; /* Allow input to grow and fill the space */
+                border: none;
+                outline: none;
+                background: none;
+                font-size: 1.2rem;
+                color: #666;
+                padding: 10px; /* Padding for input */
+                border-radius: 20px; /* Rounded corners for input */
+                min-width: 0; /* Prevent input from growing larger than available space */
+            }
+
+        .wrapper .btn {
+            box-shadow: none;
+            width: 100%;
+            height: 40px;
+            background-color: #03A9F4; /* Button color */
+            color: #fff;
+            border-radius: 25px;
+            box-shadow: 3px 3px 3px #b1b1b1, -3px -3px 3px #fff;
+            letter-spacing: 1.3px;
+        }
+
+            .wrapper .btn:hover {
+                background-color: #039BE5; /* Darker shade on hover */
+            }
+
+        .wrapper a {
+            text-decoration: none;
+            font-size: 0.8rem;
+            color: #03A9F4;
+        }
+
+            .wrapper a:hover {
+                color: #039BE5; /* Darker shade on hover */
+            }
+</style>
+
+<body>
+    <div class="wrapper">
+        <img src="/dist/img/credit/american-express.png" alt="Logo" class="logo">
+        <div class="name">Ticket Management System</div>
+        <form class="p-3" asp-action="Login" method="post">
+            <div class="form-field">
+                <span class="far fa-user"></span>
+                <input type="text" name="UserName" id="UserName" placeholder="Username" required>
+            </div>
+            <div class="form-field">
+                <span class="far fa-eye" id="togglePassword" onclick="togglePassword()"></span>
+                <input type="password" name="UserPassword" id="UserPassword" placeholder="Password" required>
+            </div>
+            <button class="btn mt-3" type="submit">Login</button>
+        </form>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('UserPassword');
+            const toggleIcon = document.getElementById('togglePassword');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        $(document).ready(function () {
+            if ('@logininfo' != null) {
+                if ('@logininfo.MessageType' != MessageType.Success) {
+                    alertify.error("@logininfo.StatusMessage");
+                }
+            }
+
+            $("#UserPassword").on({
+                keydown: function (e) {
+                    if (e.which === 32) return false; // Prevent spaces
+                },
+                change: function () {
+                    this.value = this.value.replace(/\s/g, ""); // Remove spaces
+                }
+            });
+        });
+    </script>
+</body>

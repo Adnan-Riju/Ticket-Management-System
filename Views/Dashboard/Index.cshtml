@@ -1,0 +1,60 @@
+﻿@model IEnumerable<CompanyManagement.ViewModel.TicketSummary>
+@{
+    Layout = "_AdminLayout";
+    var ticketSummaries = Model.ToList(); // Get data from the model
+
+    // Assuming you're passing the current user's role id in ViewBag or through the model
+    long userRoleId = ViewBag.UserRoleId; // You can replace this with the correct way you're passing the role
+
+    // Define URL sets based on the user's role
+    string[] urls;
+    if (userRoleId == 5 || userRoleId == 9)
+    {
+        urls = new[] { "/SupportEmployeeDashboard/EmployeeActiveTickets", "/SupportEmployeeDashboard/EmployeeProcessingTickets", "/SupportEmployeeDashboard/EmployeeClosedTickets", "/SupportEmployeeDashboard/EmployeeTotalTickets" };
+    }
+    else if (userRoleId == 2)
+    {
+        urls = new[] { "/Dashboard/ActiveTickets", "/Dashboard/ProcessingTickets", "/Dashboard/ClosedTickets", "/Dashboard/DiscardedTickets", "/Dashboard/TotalTickets" };
+    }
+    else
+    {
+        urls = new string[] { }; // default or fallback URLs if needed
+    }
+
+    // Define other visual elements
+    string[] classlist = { "bg-info", "bg-success", "bg-warning", "bg-primary" };
+    string[] iclasslist = { "ion-bag", "ion-stats-bars", "ion-person-add", "ion-ios-list" };
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="row">
+        @{
+            int i = 0;
+            foreach (var dt in Model)
+            {
+                // Cycle through the arrays
+                var index = i % 4;
+                i++;
+
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box @classlist[index]">
+                        <div class="inner">
+                            <h3>@dt.StatusCount</h3>
+                            <p>@dt.ActiveStatusString</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion @iclasslist[index]"></i>
+                        </div>
+                        <a href="@urls[index]" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+else
+{
+    <p>No tickets available for this user.</p>
+}

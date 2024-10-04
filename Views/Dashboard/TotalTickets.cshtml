@@ -1,0 +1,83 @@
+﻿@model IEnumerable<CompanyManagement.ViewModel.TicketVm>
+
+@{
+    Layout = "_AdminLayout"; // Adjust the layout as needed
+}
+
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <h1 class="m-0 text-dark">Total Tickets</h1>
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Issued By</th>
+                                    <th>Product</th>
+                                    <th>Subject</th>
+                                    <th>Assigned To</th>
+                                    <th>Status</th>
+                                    <th>Actions</th> <!-- New column for actions -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var ticket in Model)
+                                {
+                                    <tr>
+                                        <td>@ticket.IssuedByName</td>
+                                        <td>@ticket.ProductName</td>
+                                        <td>@ticket.TicketSubject</td>
+                                        <td>@ticket.AssignedName</td>
+                                        <td>
+                                            @{
+                                                string statusClass;
+                                                string statusText;
+                                                switch (ticket.ActiveStatus)
+                                                {
+                                                    case 1:
+                                                        statusClass = "badge badge-success"; // Active
+                                                        statusText = "Active";
+                                                        break;
+                                                    case 2:
+                                                        statusClass = "badge badge-warning"; // Processing
+                                                        statusText = "Processing";
+                                                        break;
+                                                    case 3:
+                                                        statusClass = "badge badge-danger"; // Closed
+                                                        statusText = "Closed";
+                                                        break;
+                                                    case 4:
+                                                        statusClass = "badge badge-secondary"; // Discarded
+                                                        statusText = "Discarded";
+                                                        break;
+                                                    default:
+                                                        statusClass = "badge badge-dark"; // Unknown
+                                                        statusText = "Unknown";
+                                                        break;
+                                                }
+                                            }
+                                            <span class="@statusClass">@statusText</span>
+                                        </td>
+                                        <td>
+                                            <a href="@Url.Action("GetTicketDetails", "Ticket", new { id = ticket.TicketId })" class="btn btn-primary btn-sm">  <i class="fas fa-list"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
